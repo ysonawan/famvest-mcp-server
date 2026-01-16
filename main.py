@@ -1,16 +1,25 @@
-# This is a sample Python script.
+import logging
+from fastmcp import FastMCP
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
+mcp = FastMCP("My MCP Server")
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+@mcp.tool
+def greet(name: str) -> str:
+    return f"Hello, {name}!"
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+if __name__ == "__main__":
+    try:
+        logger.info("Starting MCP server on port 8002 with streamable-http transport")
+        mcp.run(transport="streamable-http", port=8002)
+    except KeyboardInterrupt:
+        logger.info("MCP server interrupted by user")
+    except Exception as e:
+        logger.critical("MCP server encountered a critical error", exc_info=True)
+        raise
