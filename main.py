@@ -1,25 +1,57 @@
-import logging
 from fastmcp import FastMCP
+from fastapi import Request, HTTPException, requests
+import httpx
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+mcp = FastMCP(
+    name="Famvest MCP Server",
+    instructions="""
+        This server provides portfolio management application tools.
+    """,
 )
-logger = logging.getLogger(__name__)
 
-mcp = FastMCP("My MCP Server")
+def verify_jwt(token):
+    response = requests.get(
+        "https://famvest.online/rest/v1/users/profile",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    if response.status_code != 200:
+        raise HTTPException(401)
 
-@mcp.tool
-def greet(name: str) -> str:
-    return f"Hello, {name}!"
+    return response.json()
+
+@mcp.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    auth = request.headers.get("authorization")
+    if not auth or not auth.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    token = auth.replace("Bearer ", "")
+    request.state.user = verify_jwt(token)
+    return await call_next(request)
+
+@mcp.tool()
+async def get_holdings(request: Request):
+    """
+    Fetch user holdings.
+    """
+    url = "https://famvest.online/rest/v1/holdings"
+    async with httpx.AsyncClient(timeout=10) as client:
+        response = await client.get(
+            url,
+            headers={
+                "Authorization": request.state.bearer_token,
+                "Accept": "application/json"
+            }
+        )
+
+    if response.status_code != 200:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text
+        )
+
+    return response.json()
+
 
 if __name__ == "__main__":
-    try:
-        logger.info("Starting MCP server on port 8002 with streamable-http transport")
-        mcp.run(transport="streamable-http", port=8002)
-    except KeyboardInterrupt:
-        logger.info("MCP server interrupted by user")
-    except Exception as e:
-        logger.critical("MCP server encountered a critical error", exc_info=True)
-        raise
+    mcp.run(transport="http", port=8002)
