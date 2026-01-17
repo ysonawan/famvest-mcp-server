@@ -1,4 +1,5 @@
 from fastmcp import FastMCP
+from fastmcp.server.middleware import Middleware
 from fastapi import Request, HTTPException, requests
 import httpx
 
@@ -19,15 +20,19 @@ def verify_jwt(token):
 
     return response.json()
 
-@mcp.middleware("http")
-async def auth_middleware(request: Request, call_next):
-    auth = request.headers.get("authorization")
-    if not auth or not auth.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Unauthorized")
+class BearerAuthMiddleware(Middleware):
+    async def before_call(self, request: Request):
+        auth = request.headers.get("authorization")
 
-    token = auth.replace("Bearer ", "")
-    request.state.user = verify_jwt(token)
-    return await call_next(request)
+        if not auth or not auth.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Unauthorized")
+
+        # Store token for tool usage
+        request.state.bearer_token = auth
+
+    async def after_call(self, request: Request, response):
+        # Optional: logging, metrics, cleanup
+        return response
 
 @mcp.tool()
 async def get_holdings(request: Request):
