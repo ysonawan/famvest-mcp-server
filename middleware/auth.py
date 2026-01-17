@@ -4,6 +4,10 @@ from fastmcp.exceptions import ToolError
 
 class BearerAuthMiddleware(Middleware):
     async def on_call_tool(self, context: MiddlewareContext, call_next):
+        # Skip authentication for login tool
+        if context.message.name == "login":
+            return await call_next(context)
+
         headers = get_http_headers()
 
         auth = headers.get("authorization")
