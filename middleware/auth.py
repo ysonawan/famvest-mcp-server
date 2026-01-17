@@ -8,7 +8,7 @@ class BearerAuthMiddleware(Middleware):
 
         auth = headers.get("authorization")
         if not auth or not auth.startswith("Bearer "):
-            raise ToolError("Unauthorized")
+            raise ToolError("Please log in first using the login tool")
 
         # Continue to tool
         return await call_next(context)
