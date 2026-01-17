@@ -1,7 +1,10 @@
 from fastmcp import FastMCP
-from fastmcp.server.middleware import Middleware
-from fastapi import Request, HTTPException, requests
+from fastmcp.exceptions import ToolError
 import httpx
+from fastmcp.server.dependencies import get_http_headers
+from fastmcp.server.middleware import MiddlewareContext
+
+from middleware.auth import BearerAuthMiddleware
 
 mcp = FastMCP(
     name="Famvest MCP Server",
@@ -10,50 +13,23 @@ mcp = FastMCP(
     """,
 )
 
-def verify_jwt(token):
-    response = requests.get(
-        "https://famvest.online/rest/v1/users/profile",
-        headers={"Authorization": f"Bearer {token}"}
-    )
-    if response.status_code != 200:
-        raise HTTPException(401)
-
-    return response.json()
-
-class BearerAuthMiddleware(Middleware):
-    async def before_call(self, request: Request):
-        auth = request.headers.get("authorization")
-
-        if not auth or not auth.startswith("Bearer "):
-            raise HTTPException(status_code=401, detail="Unauthorized")
-
-        # Store token for tool usage
-        request.state.bearer_token = auth
-
-    async def after_call(self, request: Request, response):
-        # Optional: logging, metrics, cleanup
-        return response
+mcp.add_middleware(BearerAuthMiddleware())
 
 @mcp.tool()
-async def get_holdings(request: Request):
-    """
-    Fetch user holdings.
-    """
-    url = "https://famvest.online/rest/v1/holdings"
+async def get_holdings():
+    headers = get_http_headers()
+    auth = headers.get("authorization")
     async with httpx.AsyncClient(timeout=10) as client:
         response = await client.get(
-            url,
+            "https://famvest.online/rest/v1/holdings",
             headers={
-                "Authorization": request.state.bearer_token,
-                "Accept": "application/json"
-            }
+                "Authorization": auth,
+                "Accept": "application/json",
+            },
         )
 
     if response.status_code != 200:
-        raise HTTPException(
-            status_code=response.status_code,
-            detail=response.text
-        )
+        raise ToolError(response.text)
 
     return response.json()
 
