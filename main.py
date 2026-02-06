@@ -1,10 +1,7 @@
 from fastmcp import FastMCP
-from fastmcp.exceptions import ToolError
-import httpx
-from fastmcp.server.dependencies import get_http_headers
-from fastmcp.server.middleware import MiddlewareContext
 
-from middleware.auth import BearerAuthMiddleware
+from middleware.on_call_tool_middleware import OnCallToolMiddleware
+from middleware.on_request_middleware import OnRequestMiddleware
 from tools.tools import setup_tools
 
 mcp = FastMCP(
@@ -14,10 +11,10 @@ mcp = FastMCP(
     """,
 )
 
-mcp.add_middleware(BearerAuthMiddleware())
+mcp.add_middleware(OnRequestMiddleware())
+mcp.add_middleware(OnCallToolMiddleware())
 
 setup_tools(mcp)
-
 
 if __name__ == "__main__":
     mcp.run(transport="http", port=8002)

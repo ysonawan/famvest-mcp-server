@@ -1,3 +1,4 @@
-fastmcp>=2.14.2
+fastmcp>=2.14.5
 cyclopts>=5.0.0a1
 fastapi
+httpx
