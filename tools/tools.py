@@ -244,6 +244,28 @@ def setup_tools(mcp):
         return await make_api_call(ctx, "/rest/v1/market/holidays")
 
     @mcp.tool()
+    async def get_market_timings():
+        """
+        Get the current market exchange timings
+        Returns current market exchange timings for trading schedule awareness.
+        """
+        from fastmcp.server.dependencies import get_context
+        ctx = get_context()
+        return await make_api_call(ctx, "/rest/v1/market/timings")
+
+    @mcp.tool()
+    async def get_upcoming_expiries(limit: int = 5):
+        """
+        Get the upcoming contract expiries for derivatives trading.
+        Args:
+            limit: Number of upcoming expiries to retrieve (default: 5)
+        Returns a list of upcoming expiry dates for futures and options contracts to help with trading decisions.
+        """
+        from fastmcp.server.dependencies import get_context
+        ctx = get_context()
+        return await make_api_call(ctx, f"/rest/v1/instruments/expiries?limit={limit}")
+
+    @mcp.tool()
     async def get_schedulers():
         """
         Admin API - Get schedulers with status and last execution time.
