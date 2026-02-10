@@ -17,4 +17,4 @@ mcp.add_middleware(OnCallToolMiddleware())
 setup_tools(mcp)
 
 if __name__ == "__main__":
-    mcp.run(transport="http", port=8002)
+    mcp.run(transport="http", port=8003)
