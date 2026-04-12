@@ -8,10 +8,7 @@ Type=simple
 User=root
 WorkingDirectory=/opt/mcp/famvest-mcp-server
 
-Environment=PYTHONUNBUFFERED=1
-Environment=UV_CACHE_DIR=/opt/mcp/famvest-mcp-server/.uv-cache
-
-ExecStart=/opt/mcp/famvest-mcp-server/.venv/bin/python main.py
+ExecStart=/opt/mcp/famvest-mcp-server/venv/bin/python main.py
 
 Restart=always
 RestartSec=5
