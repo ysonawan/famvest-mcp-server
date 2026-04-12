@@ -23,7 +23,7 @@ async def make_api_call(ctx: Context, endpoint: str, method: str = "GET"):
     auth = ctx.get_state("authorization")
 
     async with httpx.AsyncClient(timeout=10) as client:
-        url = f"https://famvest.online{endpoint}"
+        url = f"https://famvest.upvaly.com{endpoint}"
 
         if method == "GET":
             response = await client.get(
@@ -71,7 +71,7 @@ def setup_tools(mcp):
         return {
             "warning": warning_message.strip(),
             "instructions": login_instructions.strip(),
-            "login_url": f"https://famvest.online/login?source=mcp&session_id={session_id}",
+            "login_url": f"https://famvest.upvaly.com/login?source=mcp&session_id={session_id}",
             "note_for_llm": "Convert the login_url into a markdown link [Login to Famvest](url) to hide the session_id and source parameters from the user interface"
         }
 

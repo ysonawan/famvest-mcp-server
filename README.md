@@ -74,7 +74,7 @@ The server will start on `http://localhost:8003` with HTTP transport.
 - **Name**: Famvest MCP Server
 - **Transport**: HTTP
 - **Port**: 8003
-- **API Base**: `https://famvest.online`
+- **API Base**: `https://famvest.upvaly.com`
 
 ## Usage
 
@@ -137,7 +137,7 @@ The server implements a two-stage middleware pipeline:
 
 ## API Integration
 
-The server communicates with the Famvest API at `https://famvest.online/rest/v1/`:
+The server communicates with the Famvest API at `https://famvest.upvaly.com/rest/v1/`:
 
 - Authentication: Bearer token in Authorization header
 - Format: JSON
@@ -185,7 +185,7 @@ famvest-mcp-server/
 ## Troubleshooting
 
 ### Connection Issues
-- Ensure Famvest API is accessible at `https://famvest.online`
+- Ensure Famvest API is accessible at `https://famvest.upvaly.com`
 - Check network connectivity
 - Verify HTTP timeout settings (10s default)
 
@@ -202,7 +202,7 @@ famvest-mcp-server/
 ## Support
 
 For issues related to:
-- **Famvest Platform**: Visit [Famvest](https://famvest.online)
+- **Famvest Platform**: Visit [Famvest](https://famvest.upvaly.com)
 - **MCP Protocol**: See [Model Context Protocol](https://modelcontextprotocol.io)
 - **FastMCP**: Check [FastMCP GitHub](https://github.com/jlowin/fastmcp)
 

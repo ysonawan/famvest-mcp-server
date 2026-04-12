@@ -15,7 +15,7 @@ class OnCallToolMiddleware(Middleware):
             try:
                 async with httpx.AsyncClient() as client:
                     response = await client.get(
-                        f"https://famvest.online/rest/auth/mcp/token?session_id={session_id}"
+                        f"https://famvest.upvaly.com/rest/auth/mcp/token?session_id={session_id}"
                     )
                     print("OnCallToolMiddleware - Response status code:", response.status_code)
 
